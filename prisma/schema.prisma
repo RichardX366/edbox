@@ -8,3 +8,65 @@ datasource db {
   url                  = env("DATABASE_URL")
   referentialIntegrity = "prisma"
 }
+
+model User {
+  name     String
+  email    String @id
+  password String
+  cityId   String
+  city     City   @relation(fields: [cityId], references: [name])
+  items    Item[]
+}
+
+model Item {
+  id          String    @id @default(cuid())
+  userEmail   String
+  user        User      @relation(fields: [userEmail], references: [email], onDelete: Cascade)
+  name        String
+  description String?
+  cityId      String
+  city        City      @relation(fields: [cityId], references: [name])
+  address     String
+  subject     Subject?
+  type        ItemType?
+  pictures    Picture[]
+}
+
+model Picture {
+  id      String  @id @default(cuid())
+  primary Boolean @default(false)
+  itemId  String?
+  item    Item?   @relation(fields: [itemId], references: [id], onDelete: Cascade)
+}
+
+model City {
+  name      String @id
+  stateName String
+  latitude  Float
+  longitude Float
+  timezone  String
+  zipCodes  String @db.Text
+  items     Item[]
+  users     User[]
+}
+
+enum Subject {
+  Math
+  Science
+  English
+  History
+  Geography
+  Art
+  Music
+}
+
+enum ItemType {
+  Book
+  Notebook
+  Pen
+  Pencil
+  Eraser
+  Ruler
+  Calculator
+  Textbook
+}
